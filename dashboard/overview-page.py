@@ -24,9 +24,9 @@ st.info("**Data Source:** All visualizations and forecasts are built on official
 # Data Loading
 @st.cache_data
 def load_data():
-    df = pd.read_csv("dataset_final_2014_2026.csv")
-    df['Periode'] = pd.to_datetime(df['Periode'])
-    df['Kode_HS'] = df['Kode_HS'].astype(str).str.zfill(2)
+    df = pd.read_csv("data/dataset_final_2014_2026.csv")
+    df['Period'] = pd.to_datetime(df['Period'])
+    df['HS_Code'] = df['HS_Code'].astype(str).str.zfill(2)
     return df
 
 df = load_data()
@@ -48,14 +48,14 @@ hs_mapping = {
 }
 
 hs_code = hs_mapping[commodity_selectbox]
-df_filtered = df[df['Kode_HS'] == hs_code].copy()
+df_filtered = df[df['HS_Code'] == hs_code].copy()
 
 # Calculate Cards
-mean_val = df_filtered['Nilai_USD'].mean()
-min_val = df_filtered['Nilai_USD'].min()
-max_val = df_filtered['Nilai_USD'].max()
-skew_val = df_filtered['Nilai_USD'].skew()
-kurt_val = df_filtered['Nilai_USD'].kurtosis()
+mean_val = df_filtered['Import_Value'].mean()
+min_val = df_filtered['Import_Value'].min()
+max_val = df_filtered['Import_Value'].max()
+skew_val = df_filtered['Import_Value'].skew()
+kurt_val = df_filtered['Import_Value'].kurtosis()
 
 # MAPE Mapping
 mape_mapping = {
@@ -101,8 +101,8 @@ st.markdown("---")
 st.subheader(f"Exploratory Data Analysis for {commodity_selectbox}")
 
 # The Local Date Slider
-min_date = df_filtered['Periode'].min().date()
-max_date = df_filtered['Periode'].max().date()
+min_date = df_filtered['Period'].min().date()
+max_date = df_filtered['Period'].max().date()
 
 date_selection = st.slider(
     "Filter Chart Timeline:",
@@ -115,19 +115,19 @@ date_selection = st.slider(
 # Create the temporary dataframe for the charts
 start_date = pd.to_datetime(date_selection[0])
 end_date = pd.to_datetime(date_selection[1])
-df_chart_view = df_filtered[(df_filtered['Periode'] >= start_date) & (df_filtered['Periode'] <= end_date)].copy()
+df_chart_view = df_filtered[(df_filtered['Period'] >= start_date) & (df_filtered['Period'] <= end_date)].copy()
 
 with st.container(border=True):
         fig_line = px.line(
             df_chart_view, 
-            x='Periode', 
-            y='Nilai_USD',
+            x='Period', 
+            y='Import_Value',
             title=f"Import Value Trend",
-            labels={'Periode': 'Period', 'Nilai_USD': 'Import Value (USD)'},
+            labels={'Period': 'Period', 'Import_Value': 'Import Value (USD)'},
         )
         
         # Add a horizontal line for the mean value
-        current_mean = df_chart_view['Nilai_USD'].mean()
+        current_mean = df_chart_view['Import_Value'].mean()
         fig_line.add_hline(
             y=current_mean, 
             line_dash="dash", 
@@ -148,7 +148,7 @@ with st.container(border=True):
         st.plotly_chart(fig_line, use_container_width=True)
 
 # Calculate YoY Growth on the chart view
-df_chart_view['YoY_Growth_Pct'] = df_chart_view['Nilai_USD'].pct_change(periods=12) * 100
+df_chart_view['YoY_Growth_Pct'] = df_chart_view['Import_Value'].pct_change(periods=12) * 100
 
 # Render the Charts side-by-side
 col7, col8 = st.columns(2)
@@ -160,10 +160,10 @@ with col7:
         
             fig_yoy = px.bar(
                 df_chart_view,
-                x='Periode',
+                x='Period',
                 y='YoY_Growth_Pct',
                 title=f"Year-over-Year Growth Rate",
-                labels={'Periode': 'Period', 'YoY_Growth_Pct': 'YoY Growth Rate (%)'},
+                labels={'Period': 'Period', 'YoY_Growth_Pct': 'YoY Growth Rate (%)'},
             )
             
             # Update the bar colors based on positive or negative growth
@@ -182,14 +182,14 @@ with col7:
 with col8:
     with st.container(border=True):
         # Yearly Distribution
-        df_chart_view['Year'] = df_chart_view['Periode'].dt.year
+        df_chart_view['Year'] = df_chart_view['Period'].dt.year
         fig_year = px.box(
             df_chart_view, 
             x='Year', 
-            y='Nilai_USD',
+            y='Import_Value',
             color_discrete_sequence=['#1f77b4'],
             title="Yearly Distribution",
-            labels={'Year': 'Year', 'Nilai_USD': 'Import Value (USD)'}
+            labels={'Year': 'Year', 'Import_Value': 'Import Value (USD)'}
         )
         fig_year.update_layout(
             title_x=0.4,
@@ -210,8 +210,8 @@ with st.expander("View Advanced Statistical Analysis (Seasonal Decomposition & L
     
     with st.container(border=True):
         # Prepare the data for statsmodels by setting the Datetime index
-        df_ts = df_filtered.sort_values('Periode').set_index('Periode')
-        series_to_decompose = df_ts['Nilai_USD'].rename('Import Value (USD)')
+        df_ts = df_filtered.sort_values('Period').set_index('Period')
+        series_to_decompose = df_ts['Import_Value'].rename('Import Value (USD)')
         
         # Perform seasonal decomposition
         decomposition = seasonal_decompose(series_to_decompose, model='additive', period=12)
@@ -231,10 +231,10 @@ with st.expander("View Advanced Statistical Analysis (Seasonal Decomposition & L
         # Determine the differencing order for the selected commodity
         d = d_orders[hs_code]
         if d == 1:
-            data_stationary = df_ts['Nilai_USD'].diff().dropna()
+            data_stationary = df_ts['Import_Value'].diff().dropna()
             title_suffix = "(Differencing d=1)"
         else:
-            data_stationary = df_ts['Nilai_USD'].dropna()
+            data_stationary = df_ts['Import_Value'].dropna()
             title_suffix = "(Level d=0)"
     
         # Create a 1x2 grid of subplots using Matplotlib
@@ -261,4 +261,4 @@ with st.expander("View Advanced Statistical Analysis (Seasonal Decomposition & L
         st.pyplot(fig_acf_pacf)
     
 with st.expander("View Raw Data Table"):
-    st.dataframe(df_filtered.sort_values('Periode').reset_index(drop=True), use_container_width=True)
+    st.dataframe(df_filtered.sort_values('Period').reset_index(drop=True), use_container_width=True)
