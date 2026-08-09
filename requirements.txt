@@ -6,3 +6,6 @@ seaborn
 plotly
 statsmodels
 scikit-learn
+openpyxl
+pmdarima
+xgboost
