@@ -59,11 +59,11 @@ kurt_val = df_filtered['Import_Value'].kurtosis()
 
 # MAPE Mapping
 mape_mapping = {
-    '04': '10.80%',
+    '04': '10.37%',
     '07': '17.88%',
     '10': '29.03%',
-    '12': '19.96%',
-    '17': '38.61%'
+    '12': '19.76%',
+    '17': '36.18%'
 }
 
 st.subheader(f"Data Overview for {commodity_selectbox}")
