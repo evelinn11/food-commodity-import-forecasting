@@ -7,15 +7,9 @@ import plotly.express as px
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
-st.set_page_config(
-    page_title="F&B Import Dashboard",
-    page_icon="🌿",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Title and Description
-st.title("🌿 Food Raw Materials Commodities Import Value Prediction Dashboard")
+st.title("📕 Food Raw Materials Commodities Import Value Prediction Dashboard")
 st.markdown("This dashboard is a predictive analytics tool designed to forecast the import values of essential food raw materials. " \
 "Explore historical trends, analyze market anomalies, and view machine learning-powered projections to make informed purchasing decisions.")
 st.info("**Data Source:** All visualizations and forecasts are built on official macroeconomic data from Badan Pusat Statistik " \
@@ -59,11 +53,11 @@ kurt_val = df_filtered['Import_Value'].kurtosis()
 
 # MAPE Mapping
 mape_mapping = {
-    '04': '10.80%',
+    '04': '10.37%',
     '07': '17.88%',
     '10': '29.03%',
-    '12': '19.96%',
-    '17': '38.61%'
+    '12': '19.76%',
+    '17': '36.18%'
 }
 
 st.subheader(f"Data Overview for {commodity_selectbox}")
