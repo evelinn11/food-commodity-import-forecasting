@@ -231,143 +231,146 @@ historical = (
 
 st.subheader("Import Value Forecast")
 
+with st.container(border=True):
 
-fig = go.Figure()
+    fig = go.Figure()
 
-# ------------------------------------------------------------
-# Historical Actual
-# ------------------------------------------------------------
+    # ------------------------------------------------------------
+    # Historical Actual
+    # ------------------------------------------------------------
 
-fig.add_trace(
-    go.Scatter(
-        x=historical['Period'],
-        y=historical['Import_Value'],
-        mode='lines',
-        name='Historical Actual',
-        line=dict(
-            width=2
-        ),
-        hovertemplate=(
-            "%{x|%b %Y}"
-            "<br>"
-            "Import Value: $%{y:,.0f}"
-            "<extra></extra>"
+    fig.add_trace(
+        go.Scatter(
+            x=historical['Period'],
+            y=historical['Import_Value'],
+            mode='lines',
+            name='Historical Actual',
+            line=dict(
+                width=2
+            ),
+            hovertemplate=(
+                "%{x|%b %Y}"
+                "<br>"
+                "Import Value: $%{y:,.0f}"
+                "<extra></extra>"
+            )
         )
     )
-)
 
-# ------------------------------------------------------------
-# Forecast
-# ------------------------------------------------------------
+    # ------------------------------------------------------------
+    # Forecast
+    # ------------------------------------------------------------
 
-fig.add_trace(
-    go.Scatter(
-        x=forecast_display['Date'],
-        y=forecast_display['Forecast_Value'],
-        mode='lines+markers',
-        name='Forecast',
-        line=dict(
-            dash='dash',
-            width=2
-        ),
-        hovertemplate=(
-            "%{x|%b %Y}"
-            "<br>"
-            "Forecast: $%{y:,.0f}"
-            "<extra></extra>"
+    fig.add_trace(
+        go.Scatter(
+            x=forecast_display['Date'],
+            y=forecast_display['Forecast_Value'],
+            mode='lines+markers',
+            name='Forecast',
+            line=dict(
+                dash='dash',
+                width=2
+            ),
+            hovertemplate=(
+                "%{x|%b %Y}"
+                "<br>"
+                "Forecast: $%{y:,.0f}"
+                "<extra></extra>"
+            )
         )
     )
-)
 
 
-# ------------------------------------------------------------
-# Upper Confidence Interval
-# ------------------------------------------------------------
+    # ------------------------------------------------------------
+    # Upper Confidence Interval
+    # ------------------------------------------------------------
 
-fig.add_trace(
-    go.Scatter(
-        x=forecast_display['Date'],
-        y=forecast_display['Upper_CI'],
-        mode='lines',
-        line=dict(
-            width=0
-        ),
-        name='Upper 95% CI',
-        showlegend=False,
-        hoverinfo='skip'
-    )
-)
-
-
-# ------------------------------------------------------------
-# Lower Confidence Interval
-# ------------------------------------------------------------
-
-fig.add_trace(
-    go.Scatter(
-        x=forecast_display['Date'],
-        y=forecast_display['Lower_CI'],
-        mode='lines',
-        fill='tonexty',
-        fillcolor='rgba(100, 149, 237, 0.20)',
-        line=dict(
-            width=0
-        ),
-        name='95% Confidence Interval',
-        hovertemplate=(
-            "%{x|%b %Y}"
-            "<br>"
-            "Lower CI: $%{y:,.0f}"
-            "<extra></extra>"
+    fig.add_trace(
+        go.Scatter(
+            x=forecast_display['Date'],
+            y=forecast_display['Upper_CI'],
+            mode='lines',
+            line=dict(
+                width=0
+            ),
+            name='Upper 95% CI',
+            showlegend=False,
+            hoverinfo='skip'
         )
     )
-)
 
 
-# ============================================================
-# CHART LAYOUT
-# ============================================================
+    # ------------------------------------------------------------
+    # Lower Confidence Interval
+    # ------------------------------------------------------------
 
-fig.update_layout(
-
-    title=(
-        f"{commodity_selectbox} — "
-        f"Historical and Forecasted Import Value"
-    ),
-
-    xaxis_title="Period",
-
-    yaxis_title="Import Value (USD)",
-
-    yaxis_tickprefix="$",
-
-    yaxis_tickformat=",",
-
-    hovermode="x unified",
-
-    dragmode="zoom",
-
-    legend=dict(
-        orientation="h",
-        yanchor="bottom",
-        y=1.02,
-        xanchor="center",
-        x=0.5
-    ),
-
-    margin=dict(
-        l=20,
-        r=20,
-        t=80,
-        b=20
+    fig.add_trace(
+        go.Scatter(
+            x=forecast_display['Date'],
+            y=forecast_display['Lower_CI'],
+            mode='lines',
+            fill='tonexty',
+            fillcolor='rgba(100, 149, 237, 0.20)',
+            line=dict(
+                width=0
+            ),
+            name='95% Confidence Interval',
+            hovertemplate=(
+                "%{x|%b %Y}"
+                "<br>"
+                "Lower CI: $%{y:,.0f}"
+                "<extra></extra>"
+            )
+        )
     )
-)
 
 
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
+    # ============================================================
+    # CHART LAYOUT
+    # ============================================================
+
+    fig.update_layout(
+
+        title=(
+            f"{commodity_selectbox} — "
+            f"Historical and Forecasted Import Value"
+        ),
+        
+        title_x=0.325,
+        
+        xaxis_title="Period",
+
+        yaxis_title="Import Value (USD)",
+
+        yaxis_tickprefix="$",
+
+        yaxis_tickformat=",",
+
+        hovermode="x unified",
+
+        dragmode="zoom",
+
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        ),
+
+        margin=dict(
+            l=20,
+            r=20,
+            t=80,
+            b=20
+        )
+    )
+
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
 
 # ============================================================
 # FORECAST TABLE
