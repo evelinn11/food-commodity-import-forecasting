@@ -65,3 +65,51 @@ CHAMPION_MODELS = {
         }
     }
 }
+
+# ============================================================
+# General Model Comparison Results
+# Experiment: General SARIMA vs XGBoost
+# Metric: MAPE (%)
+# ============================================================
+
+GENERAL_MODEL_RESULTS = {
+    '04': {
+        'commodity': 'Dairy & Honey',
+        'SARIMA Base': 12.19,
+        'SARIMA Tuned': 14.63,
+        'XGBoost Base': 18.91,
+        'XGBoost Tuned': 10.80
+    },
+
+    '07': {
+        'commodity': 'Vegetables',
+        'SARIMA Base': 17.88,
+        'SARIMA Tuned': 19.19,
+        'XGBoost Base': 22.36,
+        'XGBoost Tuned': 21.37
+    },
+
+    '10': {
+        'commodity': 'Cereals',
+        'SARIMA Base': 82.29,
+        'SARIMA Tuned': 39.61,
+        'XGBoost Base': 36.60,
+        'XGBoost Tuned': 29.03
+    },
+
+    '12': {
+        'commodity': 'Seeds & Oleaginous Fruits',
+        'SARIMA Base': 27.93,
+        'SARIMA Tuned': 29.87,
+        'XGBoost Base': 28.69,
+        'XGBoost Tuned': 19.96
+    },
+
+    '17': {
+        'commodity': 'Sugar',
+        'SARIMA Base': 71.44,
+        'SARIMA Tuned': 71.53,
+        'XGBoost Base': 40.29,
+        'XGBoost Tuned': 38.61
+    }
+}
