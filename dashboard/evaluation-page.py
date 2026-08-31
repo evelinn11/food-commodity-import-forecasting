@@ -43,25 +43,37 @@ st.subheader("Evaluation Methodology")
 
 col1, col2, col3 = st.columns(3)
 
+
 with col1:
     with st.container(border=True):
-        st.metric(
-            label="Training Period",
-            value="Jan 2014 – Dec 2024"
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">Training Period</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:16px;">'
+            f'Jan 2014 – Dec 2024'
+            f'</div>',
+            unsafe_allow_html=True
         )
+
 
 with col2:
     with st.container(border=True):
-        st.metric(
-            label="Testing Period",
-            value="Jan 2025 – May 2026"
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">Testing Period</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:16px;">'
+            f'Jan 2025 – May 2026'
+            f'</div>',
+            unsafe_allow_html=True
         )
+
 
 with col3:
     with st.container(border=True):
-        st.metric(
-            label="Evaluation Metric",
-            value="MAPE"
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">Evaluation Metric</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:16px;">'
+            f'MAPE'
+            f'</div>',
+            unsafe_allow_html=True
         )
 
 st.info(

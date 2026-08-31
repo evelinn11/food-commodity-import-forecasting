@@ -170,34 +170,35 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     with st.container(border=True):
-
-        st.metric(
-            label="Forecast Model",
-            value=model_name
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">Forecast Model</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:16px;">'
+            f'{model_name}'
+            f'</div>',
+            unsafe_allow_html=True
         )
 
 
 with col2:
     with st.container(border=True):
-
-        st.metric(
-            label="Validation MAPE",
-            value=f"{mape:.2f}%"
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">Validation MAPE</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:16px;">'
+            f'{mape:.2f}%'
+            f'</div>',
+            unsafe_allow_html=True
         )
 
 
 with col3:
     with st.container(border=True):
-
-        st.metric(
-            label="Forecast Period",
-            value=(
-                f"{forecast_start.strftime('%b %Y')}"
-                f" – "
-                f"{forecast_end.strftime('%b %Y')}"
-            )
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">Forecast Period</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:16px;">'
+            f'{forecast_start.strftime("%b %Y")} – {forecast_end.strftime("%b %Y")}'
+            f'</div>',
+            unsafe_allow_html=True
         )
-
 
 # ============================================================
 # INFORMATION
