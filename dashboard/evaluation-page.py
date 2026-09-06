@@ -9,22 +9,10 @@ from model_config import (
 
 
 # ============================================================
-# PAGE CONFIGURATION
-# ============================================================
-
-st.set_page_config(
-    page_title="Model Evaluation",
-    page_icon="📈",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-
-# ============================================================
 # PAGE TITLE
 # ============================================================
 
-st.title("📈 Model Evaluation")
+st.title("📈 Food Raw Material Import Value Model Evaluation")
 
 st.markdown(
     """
@@ -80,8 +68,8 @@ st.info(
     """
     Models are evaluated using the same hold-out testing period.
     MAPE is used as the primary evaluation metric because the
-    five commodity groups have different import-value scales.
-    Lower MAPE indicates lower forecasting error.
+    five commodity groups have different import value scales.
+    **Lower MAPE indicates lower forecasting error.**
     """
 )
 
@@ -261,8 +249,6 @@ with st.container(border=True):
 
 
 st.markdown("---")
-
-
 # ============================================================
 # 4. EXPERIMENT PROCESS
 # ============================================================
@@ -271,19 +257,57 @@ st.subheader("How Were the Deployed Models Selected?")
 
 st.markdown(
     """
-    The final deployed models were selected through multiple
-    experimental stages. The purpose of this process was to compare
-    forecasting approaches and investigate whether commodity-specific
-    optimization could improve predictive performance.
+    The final deployed models were selected through two experimental
+    stages. The first experiment compared SARIMA and XGBoost under
+    consistent general configurations, while the second experiment
+    optimized each local model according to the characteristics of
+    each commodity.
     """
 )
 
 
+# ============================================================
+# Experiment 2 Results
+# ============================================================
+
+EXPERIMENT_2_RESULTS = {
+    "04": {
+        "Commodity": "Dairy & Honey",
+        "SARIMA": 14.63,
+        "XGBoost": 10.37
+    },
+
+    "07": {
+        "Commodity": "Vegetables",
+        "SARIMA": 17.88,
+        "XGBoost": 19.68
+    },
+
+    "10": {
+        "Commodity": "Cereals",
+        "SARIMA": 77.51,
+        "XGBoost": 30.14
+    },
+
+    "12": {
+        "Commodity": "Seeds & Oleaginous Fruits",
+        "SARIMA": 25.36,
+        "XGBoost": 19.76
+    },
+
+    "17": {
+        "Commodity": "Sugar",
+        "SARIMA": 71.53,
+        "XGBoost": 36.18
+    }
+}
+
+
 with st.expander("View Experimental Process"):
 
-    # --------------------------------------------------------
-    # Experiment 1
-    # --------------------------------------------------------
+    # ========================================================
+    # EXPERIMENT 1
+    # ========================================================
 
     st.markdown(
         "### Experiment 1 — General Model Comparison"
@@ -291,17 +315,97 @@ with st.expander("View Experimental Process"):
 
     st.write(
         """
-        SARIMA and XGBoost were first evaluated using a general
-        model configuration across the five commodity groups.
-        This experiment established the initial performance
-        comparison between the two forecasting approaches.
+        SARIMA and XGBoost were first evaluated using consistent
+        general configurations across all five commodity groups.
+
+        The same modeling configuration within each approach and
+        the same log-transformed target treatment were applied to
+        every commodity. This experiment provides a controlled
+        baseline comparison of the two forecasting approaches.
         """
     )
 
 
     # --------------------------------------------------------
-    # Experiment 2
+    # Experiment 1 Comparison Table
     # --------------------------------------------------------
+
+    experiment_1_df = (
+        pd.DataFrame
+        .from_dict(
+            GENERAL_MODEL_RESULTS,
+            orient="index"
+        )
+        .reset_index()
+        .rename(
+            columns={
+                "index": "HS"
+            }
+        )
+    )
+
+
+    # Keep only Experiment 1 results
+    experiment_1_display = experiment_1_df[
+        [
+            "HS",
+            "commodity",
+            "SARIMA Base",
+            "XGBoost Base",
+            "SARIMA Tuned",
+            "XGBoost Tuned"
+        ]
+    ].copy()
+
+
+    experiment_1_display.rename(
+        columns={
+            "commodity": "Commodity",
+            "SARIMA Base": "SARIMA Base",
+            "XGBoost Base": "XGBoost Base",
+            "SARIMA Tuned": "SARIMA Tuned",
+            "XGBoost Tuned": "XGBoost Tuned"
+        },
+        inplace=True
+    )
+
+
+    st.dataframe(
+        experiment_1_display.style.format({
+            "SARIMA Base": "{:.2f}%",
+            "XGBoost Base": "{:.2f}%",
+            "SARIMA Tuned": "{:.2f}%",
+            "XGBoost Tuned": "{:.2f}%"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    st.caption(
+        "Lower MAPE indicates better forecasting performance."
+    )
+    
+    st.info(
+        """
+        **Interpretation:** The general comparison shows that model
+        performance varies across commodities, indicating that one
+        forecasting approach does not consistently perform best for
+        every time series. XGBoost tends to achieve lower MAPE for
+        several commodities, while SARIMA remains competitive for
+        commodities with more regular historical patterns. This
+        suggests that model selection should consider the
+        characteristics of each commodity rather than applying one
+        model universally.
+        """
+    )
+
+    st.markdown("---")
+
+
+    # ========================================================
+    # EXPERIMENT 2
+    # ========================================================
 
     st.markdown(
         "### Experiment 2 — Commodity-Specific Optimization"
@@ -309,17 +413,72 @@ with st.expander("View Experimental Process"):
 
     st.write(
         """
-        Subsequent experiments allowed the XGBoost configuration
-        to vary by commodity. Different feature combinations,
-        hyperparameters, and transformation choices were evaluated
-        according to the characteristics of each commodity time series.
+        In the second experiment, SARIMA and XGBoost were optimized
+        separately for each commodity.
+
+        Model parameters, feature configurations, and target
+        transformation choices were evaluated to identify the most
+        suitable configuration for each local commodity model.
+        The table below compares the best SARIMA and XGBoost results
+        obtained for each commodity.
         """
     )
 
 
     # --------------------------------------------------------
-    # Final Selection
+    # Experiment 2 Comparison Table
     # --------------------------------------------------------
+
+    experiment_2_rows = []
+
+    for hs_code, result in EXPERIMENT_2_RESULTS.items():
+
+        experiment_2_rows.append({
+            "HS": hs_code,
+            "Commodity": result["Commodity"],
+            "SARIMA": result["SARIMA"],
+            "XGBoost": result["XGBoost"]
+        })
+
+
+    experiment_2_df = pd.DataFrame(
+        experiment_2_rows
+    )
+
+
+    st.dataframe(
+        experiment_2_df.style.format({
+            "SARIMA": "{:.2f}%",
+            "XGBoost": "{:.2f}%"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    st.caption(
+        "Lower MAPE indicates better forecasting performance."
+    )
+    
+    st.info(
+        """
+        **Interpretation:** After commodity-specific optimization,
+        XGBoost achieved lower MAPE for 4 of the 5 commodity
+        groups, while SARIMA achieved the lowest MAPE for
+        HS 07 (Vegetables). The advantage of XGBoost is particularly large for HS 10
+        and HS 17, which also exhibit substantial historical
+        fluctuations. However, the results also show that no model
+        is universally superior, as SARIMA remains more accurate
+        for HS 07.
+        """
+    )
+
+    st.markdown("---")
+
+
+    # ========================================================
+    # FINAL MODEL SELECTION
+    # ========================================================
 
     st.markdown(
         "### Final Model Selection"
@@ -327,83 +486,11 @@ with st.expander("View Experimental Process"):
 
     st.write(
         """
-        The final forecasting system uses the selected deployed
-        configuration for each commodity. These models are then
-        retrained using the complete available dataset and used
-        to generate future forecasts.
+        The best-performing configuration for each commodity was
+        selected based on the experimental results.
+
+        The selected models were then retrained using the complete
+        available historical dataset and are used by the Forecasting
+        page to generate future import-value forecasts.
         """
     )
-
-
-st.markdown("---")
-
-
-# ============================================================
-# 5. MODEL PERFORMANCE COMPARISON
-# ============================================================
-
-st.subheader("Model Performance Comparison")
-
-st.markdown(
-    """
-    The following results show the initial comparison between
-    SARIMA and XGBoost using the general model configuration.
-    Lower MAPE indicates better forecasting performance.
-    """
-)
-
-
-# ------------------------------------------------------------
-# Convert results into DataFrame
-# ------------------------------------------------------------
-
-comparison_df = (
-    pd.DataFrame
-    .from_dict(
-        GENERAL_MODEL_RESULTS,
-        orient="index"
-    )
-    .reset_index()
-    .rename(
-        columns={
-            "index": "HS_Code"
-        }
-    )
-)
-
-
-# ------------------------------------------------------------
-# Comparison Table
-# ------------------------------------------------------------
-
-display_comparison = comparison_df[
-    [
-        "HS_Code",
-        "commodity",
-        "SARIMA Base",
-        "SARIMA Tuned",
-        "XGBoost Base",
-        "XGBoost Tuned"
-    ]
-].copy()
-
-
-display_comparison.rename(
-    columns={
-        "HS_Code": "HS",
-        "commodity": "Commodity"
-    },
-    inplace=True
-)
-
-
-st.dataframe(
-    display_comparison.style.format({
-        "SARIMA Base": "{:.2f}%",
-        "SARIMA Tuned": "{:.2f}%",
-        "XGBoost Base": "{:.2f}%",
-        "XGBoost Tuned": "{:.2f}%"
-    }),
-    use_container_width=True,
-    hide_index=True
-)

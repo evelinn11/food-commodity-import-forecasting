@@ -78,7 +78,7 @@ HS_MAPPING = {
 # ============================================================
 
 st.title(
-    "📈 Food Raw Materials Import Value Forecast"
+    "📈 Food Raw Material Import Value Forecast"
 )
 
 st.markdown(

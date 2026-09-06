@@ -102,24 +102,20 @@ for hs_code in df["HS_Code"].unique():
 # Header
 # ============================================================
 
-st.title("📕 Food Raw Material Import Value Forecasting")
-
-st.subheader(
-    "Summary"
-)
+st.title("📕 Food Raw Material Import Value Dashboard")
 
 st.markdown(
     """
     An interactive forecasting dashboard designed to help food
-    business owners understand historical import-value movements
-    and anticipate future changes in selected food raw-material
+    business owners understand historical import value movements
+    and anticipate future changes in selected food raw material
     commodity groups in Indonesia.
     """
 )
 
 st.info(
     """
-    The dashboard uses official monthly import-value data from
+    The dashboard uses official monthly import value data from
     Badan Pusat Statistik (BPS) Indonesia. Forecasts are intended as an additional planning reference,
     not as a direct prediction of the ingredient price paid by
     an individual business.
@@ -161,7 +157,7 @@ with left:
 
         st.markdown(
             """
-            When input costs rise, business owners may need to
+            When raw material costs rise, business owners may need to
             reconsider purchasing quantities, budgets, inventory plans,
             or selling prices. However, increasing selling prices can
             also affect customer demand.
@@ -182,7 +178,7 @@ with right:
         st.markdown(
             """
             This project forecasts the monthly import value of selected
-            food raw-material commodity groups in Indonesia.
+            food raw material commodity groups in Indonesia.
 
             The goal is to provide food business owners with a
             forward-looking reference that complements historical trends
@@ -216,7 +212,7 @@ with benefit_1:
 
         st.write(
             """
-            Use expected import-value movements as an additional
+            Use expected import value movements as an additional
             reference when preparing future purchasing plans.
             """
         )
@@ -270,7 +266,7 @@ st.header("2. Dataset Overview")
 st.markdown(
     """
     The dataset contains monthly Indonesian import values for five
-    selected food raw-material commodity groups. The data was collected from official BPS import statistics and
+    selected food raw material commodity groups. The data was collected from official BPS import statistics and
     consolidated into one time-series dataset.
     """
 )
@@ -337,7 +333,7 @@ st.header("3. Data Preparation")
 
 st.markdown(
     """
-    The original BPS dataset requires restructuring before they could be used
+    The original BPS dataset requires reshaping before they could be used
     for time-series analysis and forecasting.
     """
 )
@@ -455,7 +451,6 @@ with st.expander("View Final Prepared Dataset"):
 
 st.divider()
 
-
 # ============================================================
 # 4. EXPLORATORY DATA ANALYSIS
 # ============================================================
@@ -464,11 +459,107 @@ st.header("4. Exploratory Data Analysis")
 
 st.markdown(
     """
-    Explore the historical behavior of each commodity before moving
-    to the Forecasting page. The filters below only affect this
-    Exploratory Data Analysis section.
+    Explore the historical behavior of each commodity from
+    January 2014 to May 2026. Select a commodity group below
+    to view its import value trend, monthly year-over-year growth,
+    and yearly distribution.
     """
 )
+
+
+# ============================================================
+# EDA INTERPRETATIONS
+# ============================================================
+
+EDA_INTERPRETATIONS = {
+
+    "04": {
+        "trend": """
+        Import values declined during the early observation period
+        before gradually recovering from 2017 onward. A noticeable
+        increase occurred during 2021–2022, followed by a decline
+        in 2023. Import values afterward remained relatively higher
+        than in most of the earlier years.
+        """,
+
+        "distribution": """
+        The yearly distributions show that monthly import values
+        shifted toward higher levels around 2021–2022. Some years
+        also display wider distributions, indicating greater
+        month-to-month variation in import values.
+        """
+    },
+
+    "07": {
+        "trend": """
+        Vegetable import values show a generally increasing
+        long-term pattern, although several temporary declines
+        occur throughout the observation period. Import values
+        reached relatively high levels in the later years before
+        declining again toward the end of the period.
+        """,
+
+        "distribution": """
+        The yearly distributions generally shift toward higher
+        monthly import values in the later years compared with
+        the beginning of the observation period. However, the
+        distributions still overlap considerably, indicating
+        continued month-to-month variation.
+        """
+    },
+
+    "10": {
+        "trend": """
+        Cereals have the highest import-value scale among the five
+        commodity groups and show substantial fluctuations over time.
+        A strong upward movement is visible during the later years,
+        particularly from 2021 onward, followed by a noticeable
+        decline toward the end of the observation period.
+        """,
+
+        "distribution": """
+        Cereals show a wide distribution of monthly import values
+        and several unusually high observations. This indicates
+        greater variability compared with the other commodity groups
+        and is consistent with the strongly right-skewed distribution
+        observed in the data.
+        """
+    },
+
+    "12": {
+        "trend": """
+        Import values remained comparatively stable during much
+        of the earlier period before increasing substantially
+        during 2021–2022. After reaching higher levels during this
+        period, import values show a declining tendency in the
+        following years.
+        """,
+
+        "distribution": """
+        The yearly distributions shift upward during 2021–2022,
+        reflecting generally higher monthly import values during
+        those years. The distributions then move toward lower
+        levels in the following period.
+        """
+    },
+
+    "17": {
+        "trend": """
+        Sugar import values show pronounced fluctuations throughout
+        the observation period. Several periods of substantial
+        increase and decline are visible, with import values generally
+        reaching higher levels in the later years than at the
+        beginning of the series.
+        """,
+
+        "distribution": """
+        The yearly distributions indicate considerable variation
+        in monthly sugar import values. Later years generally show
+        higher monthly import levels than the early observation
+        period, although substantial within-year variation remains.
+        """
+    }
+}
 
 
 # ============================================================
@@ -484,25 +575,24 @@ hs_code = COMMODITY_OPTIONS[
     commodity_selectbox
 ]
 
+
+# Filter selected commodity and sort chronologically
 df_filtered = (
     df[
         df["HS_Code"] == hs_code
     ]
     .copy()
     .sort_values("Period")
+    .reset_index(drop=True)
 )
 
 
 # ============================================================
-# YoY Growth
+# Monthly Year-over-Year Growth
 # ============================================================
 
-# Important:
-# Calculate YoY BEFORE filtering the visible date range.
-#
-# This ensures pct_change(periods=12) still has access to
-# observations from 12 months earlier.
-
+# Each month's import value is compared with
+# the same month 12 months earlier.
 df_filtered["YoY_Growth_Pct"] = (
     df_filtered["Import_Value"]
     .pct_change(periods=12)
@@ -510,145 +600,148 @@ df_filtered["YoY_Growth_Pct"] = (
 )
 
 
-# ============================================================
-# Date Filter
-# ============================================================
-
-min_date = (
+# Create year column for yearly distribution chart
+df_filtered["Year"] = (
     df_filtered["Period"]
-    .min()
-    .date()
+    .dt.year
+    .astype(str)
 )
 
-max_date = (
-    df_filtered["Period"]
-    .max()
-    .date()
-)
-
-
-date_selection = st.slider(
-    "Filter chart timeline:",
-    min_value=min_date,
-    max_value=max_date,
-    value=(min_date, max_date),
-    format="MMM YYYY"
-)
-
-
-start_date = pd.to_datetime(
-    date_selection[0]
-)
-
-end_date = pd.to_datetime(
-    date_selection[1]
-)
-
-
-df_chart_view = df_filtered[
-    (
-        df_filtered["Period"]
-        >= start_date
-    )
-    &
-    (
-        df_filtered["Period"]
-        <= end_date
-    )
-].copy()
 
 # ============================================================
-# Selected Period Highlights
+# Historical Highlights
 # ============================================================
 
-st.subheader("Selected-Period Highlights")
+st.subheader("Historical Highlights")
 
-if not df_chart_view.empty:
 
-    highest_row = df_chart_view.loc[
-        df_chart_view["Import_Value"].idxmax()
+# Highest monthly import value
+highest_row = df_filtered.loc[
+    df_filtered["Import_Value"].idxmax()
+]
+
+
+# Lowest monthly import value
+lowest_row = df_filtered.loc[
+    df_filtered["Import_Value"].idxmin()
+]
+
+
+# Latest available monthly YoY
+latest_yoy_series = (
+    df_filtered[
+        "YoY_Growth_Pct"
     ]
+    .dropna()
+)
 
-    lowest_row = df_chart_view.loc[
-        df_chart_view["Import_Value"].idxmin()
+
+latest_yoy = (
+    latest_yoy_series.iloc[-1]
+    if not latest_yoy_series.empty
+    else None
+)
+
+
+latest_yoy_period = (
+    df_filtered.loc[
+        latest_yoy_series.index[-1],
+        "Period"
     ]
+    if not latest_yoy_series.empty
+    else None
+)
 
-    latest_yoy_series = (
-        df_chart_view["YoY_Growth_Pct"]
-        .dropna()
-    )
 
-    latest_yoy = (
-        latest_yoy_series.iloc[-1]
-        if not latest_yoy_series.empty
-        else None
-    )
+highlight_1, highlight_2, highlight_3 = st.columns(3)
 
-    highlight_1, highlight_2, highlight_3 = st.columns(3)
 
-    # Highest value
-    with highlight_1:
-        with st.container(border=True):
-            st.markdown(
-                f'<div style="font-size:16px; margin-bottom:4px;">'
-                f'Highest Import Value'
-                f'</div>'
-                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
-                f'${highest_row["Import_Value"]:,.0f}'
-                f'</div>'
-                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
-                f'Peak month: {highest_row["Period"].strftime("%b %Y")}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
+# -------------------------------
+# Highest Import Value
+# -------------------------------
 
-    # Lowest value
-    with highlight_2:
-        with st.container(border=True):
-            st.markdown(
-                f'<div style="font-size:16px; margin-bottom:4px;">'
-                f'Lowest Import Value'
-                f'</div>'
-                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
-                f'${lowest_row["Import_Value"]:,.0f}'
-                f'</div>'
-                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
-                f'Lowest month: {lowest_row["Period"].strftime("%b %Y")}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
+with highlight_1:
 
-    # Latest YoY
-    with highlight_3:
-        with st.container(border=True):
+    with st.container(border=True):
 
-            latest_yoy_text = (
-                f"{latest_yoy:.1f}%"
-                if latest_yoy is not None
-                else "N/A"
-            )
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">'
+            f'Highest Monthly Import Value'
+            f'</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
+            f'${highest_row["Import_Value"]:,.0f}'
+            f'</div>'
+            f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
+            f'Peak month: {highest_row["Period"].strftime("%b %Y")}'
+            f'</div>',
+            unsafe_allow_html=True
+        )
 
-            st.markdown(
-                f'<div style="font-size:16px; margin-bottom:4px;">'
-                f'Latest YoY Change'
-                f'</div>'
-                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
-                f'{latest_yoy_text}'
-                f'</div>'
-                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
-                f'Latest 12-month comparison'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-            
+
+# -------------------------------
+# Lowest Import Value
+# -------------------------------
+
+with highlight_2:
+
+    with st.container(border=True):
+
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">'
+            f'Lowest Monthly Import Value'
+            f'</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
+            f'${lowest_row["Import_Value"]:,.0f}'
+            f'</div>'
+            f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
+            f'Lowest month: {lowest_row["Period"].strftime("%b %Y")}'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+
+# -------------------------------
+# Latest Monthly YoY
+# -------------------------------
+
+with highlight_3:
+
+    with st.container(border=True):
+
+        latest_yoy_text = (
+            f"{latest_yoy:.1f}%"
+            if latest_yoy is not None
+            else "N/A"
+        )
+
+        latest_period_text = (
+            latest_yoy_period.strftime("%b %Y")
+            if latest_yoy_period is not None
+            else "N/A"
+        )
+
+        st.markdown(
+            f'<div style="font-size:16px; margin-bottom:4px;">'
+            f'Latest YoY Change'
+            f'</div>'
+            f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
+            f'{latest_yoy_text}'
+            f'</div>'
+            f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
+            f'12-month comparison: {latest_period_text}'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+
 # ============================================================
-# Import Value Trend
+# IMPORT VALUE TREND
 # ============================================================
 
 with st.container(border=True):
 
     fig_line = px.line(
-        df_chart_view,
+        df_filtered,
         x="Period",
         y="Import_Value",
         title=(
@@ -662,18 +755,20 @@ with st.container(border=True):
     )
 
 
-    # Average value for visible date range
-    current_mean = (
-        df_chart_view["Import_Value"]
+    # Historical average across the entire period
+    historical_mean = (
+        df_filtered[
+            "Import_Value"
+        ]
         .mean()
     )
 
 
     fig_line.add_hline(
-        y=current_mean,
+        y=historical_mean,
         line_dash="dash",
         line_color="gray",
-        annotation_text="Selected-period average",
+        annotation_text="Historical average",
         annotation_position="top left",
         opacity=0.7,
     )
@@ -693,6 +788,19 @@ with st.container(border=True):
     )
 
 
+    # -------------------------------
+    # Trend Interpretation
+    # -------------------------------
+
+    with st.expander("View Interpretation"):
+
+        st.markdown(
+            EDA_INTERPRETATIONS[
+                hs_code
+            ]["trend"]
+        )
+
+
 # ============================================================
 # YoY & Distribution Charts
 # ============================================================
@@ -700,31 +808,46 @@ with st.container(border=True):
 chart_left, chart_right = st.columns(2)
 
 
-# -------------------------------
-# YoY Growth
-# -------------------------------
+# ============================================================
+# MONTHLY YEAR-OVER-YEAR GROWTH
+# ============================================================
 
 with chart_left:
 
     with st.container(border=True):
 
+        # First 12 observations do not have
+        # a previous-year comparison.
+        yoy_chart_data = (
+            df_filtered
+            .dropna(
+                subset=[
+                    "YoY_Growth_Pct"
+                ]
+            )
+            .copy()
+        )
+
+
+        # Positive growth = green
+        # Negative growth = red
         yoy_colors = [
-            "#d62728"
-            if value < 0
-            else "#2ca02c"
+            "#2ca02c"
+            if value >= 0
+            else "#d62728"
 
             for value
-            in df_chart_view[
+            in yoy_chart_data[
                 "YoY_Growth_Pct"
-            ].fillna(0)
+            ]
         ]
 
 
         fig_yoy = px.bar(
-            df_chart_view,
+            yoy_chart_data,
             x="Period",
             y="YoY_Growth_Pct",
-            title="Year-over-Year Growth Rate",
+            title="Monthly Year-over-Year Growth Rate",
             labels={
                 "Period": "Period",
                 "YoY_Growth_Pct":
@@ -735,6 +858,14 @@ with chart_left:
 
         fig_yoy.update_traces(
             marker_color=yoy_colors
+        )
+
+
+        # Zero reference line
+        fig_yoy.add_hline(
+            y=0,
+            line_width=1,
+            line_color="gray"
         )
 
 
@@ -752,23 +883,139 @@ with chart_left:
         )
 
 
-# -------------------------------
-# Yearly Distribution
-# -------------------------------
+        # -------------------------------
+        # Monthly YoY Interpretation
+        # -------------------------------
+
+        with st.expander("View Interpretation"):
+
+            if not yoy_chart_data.empty:
+
+                # Strongest increase
+                highest_yoy_row = yoy_chart_data.loc[
+                    yoy_chart_data[
+                        "YoY_Growth_Pct"
+                    ].idxmax()
+                ]
+
+
+                # Strongest decline
+                lowest_yoy_row = yoy_chart_data.loc[
+                    yoy_chart_data[
+                        "YoY_Growth_Pct"
+                    ].idxmin()
+                ]
+
+
+                # Latest comparison
+                latest_yoy_row = (
+                    yoy_chart_data
+                    .iloc[-1]
+                )
+
+
+                highest_yoy = (
+                    highest_yoy_row[
+                        "YoY_Growth_Pct"
+                    ]
+                )
+
+                lowest_yoy = (
+                    lowest_yoy_row[
+                        "YoY_Growth_Pct"
+                    ]
+                )
+
+                latest_yoy_value = (
+                    latest_yoy_row[
+                        "YoY_Growth_Pct"
+                    ]
+                )
+
+
+                highest_period = (
+                    highest_yoy_row[
+                        "Period"
+                    ]
+                    .strftime("%b %Y")
+                )
+
+                lowest_period = (
+                    lowest_yoy_row[
+                        "Period"
+                    ]
+                    .strftime("%b %Y")
+                )
+
+                latest_period = (
+                    latest_yoy_row[
+                        "Period"
+                    ]
+                    .strftime("%b %Y")
+                )
+
+
+                # Describe latest YoY direction
+                if latest_yoy_value > 0:
+
+                    latest_interpretation = (
+                        "higher than the same month "
+                        "one year earlier"
+                    )
+
+                elif latest_yoy_value < 0:
+
+                    latest_interpretation = (
+                        "lower than the same month "
+                        "one year earlier"
+                    )
+
+                else:
+
+                    latest_interpretation = (
+                        "approximately unchanged from "
+                        "the same month one year earlier"
+                    )
+
+
+                st.markdown(
+                    f"""
+                    Monthly YoY growth compares each month's import
+                    value with the same month one year earlier.
+
+                    For {commodity_selectbox}, the strongest
+                    YoY increase occurred in {highest_period}
+                    at {highest_yoy:.1f}%, while the largest
+                    YoY decline occurred in {lowest_period}
+                    at {lowest_yoy:.1f}%.
+
+                    The latest observation in {latest_period}
+                    recorded a YoY change of
+                    {latest_yoy_value:.1f}%, meaning the import
+                    value was {latest_interpretation}.
+                    """
+                )
+
+            else:
+
+                st.write(
+                    """
+                    At least 12 months of historical data are required
+                    to calculate a year-over-year comparison.
+                    """
+                )
+
+
+# ============================================================
+# YEARLY DISTRIBUTION
+# ============================================================
 
 with chart_right:
 
     with st.container(border=True):
 
-        df_chart_view["Year"] = (
-            df_chart_view["Period"]
-            .dt.year
-            .astype(str)
-        )
-
-
         fig_year = px.box(
-            df_chart_view,
+            df_filtered,
             x="Year",
             y="Import_Value",
             title="Yearly Distribution",
@@ -790,3 +1037,27 @@ with chart_right:
             fig_year,
             use_container_width=True
         )
+
+
+        # -------------------------------
+        # Distribution Interpretation
+        # -------------------------------
+
+        with st.expander("View Interpretation"):
+
+            st.markdown(
+                EDA_INTERPRETATIONS[
+                    hs_code
+                ]["distribution"]
+            )
+
+            st.caption(
+                """
+                The line inside each box represents the median
+                monthly import value. A taller box indicates
+                greater variation among monthly values within
+                that year. The 2026 distribution should be
+                interpreted carefully because it only contains
+                data from January to May.
+                """
+            )
