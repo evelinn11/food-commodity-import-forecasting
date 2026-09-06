@@ -557,7 +557,90 @@ df_chart_view = df_filtered[
     )
 ].copy()
 
+# ============================================================
+# Selected Period Highlights
+# ============================================================
 
+st.subheader("Selected-Period Highlights")
+
+if not df_chart_view.empty:
+
+    highest_row = df_chart_view.loc[
+        df_chart_view["Import_Value"].idxmax()
+    ]
+
+    lowest_row = df_chart_view.loc[
+        df_chart_view["Import_Value"].idxmin()
+    ]
+
+    latest_yoy_series = (
+        df_chart_view["YoY_Growth_Pct"]
+        .dropna()
+    )
+
+    latest_yoy = (
+        latest_yoy_series.iloc[-1]
+        if not latest_yoy_series.empty
+        else None
+    )
+
+    highlight_1, highlight_2, highlight_3 = st.columns(3)
+
+    # Highest value
+    with highlight_1:
+        with st.container(border=True):
+            st.markdown(
+                f'<div style="font-size:16px; margin-bottom:4px;">'
+                f'Highest Import Value'
+                f'</div>'
+                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
+                f'${highest_row["Import_Value"]:,.0f}'
+                f'</div>'
+                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
+                f'Peak month: {highest_row["Period"].strftime("%b %Y")}'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+    # Lowest value
+    with highlight_2:
+        with st.container(border=True):
+            st.markdown(
+                f'<div style="font-size:16px; margin-bottom:4px;">'
+                f'Lowest Import Value'
+                f'</div>'
+                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
+                f'${lowest_row["Import_Value"]:,.0f}'
+                f'</div>'
+                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
+                f'Lowest month: {lowest_row["Period"].strftime("%b %Y")}'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+    # Latest YoY
+    with highlight_3:
+        with st.container(border=True):
+
+            latest_yoy_text = (
+                f"{latest_yoy:.1f}%"
+                if latest_yoy is not None
+                else "N/A"
+            )
+
+            st.markdown(
+                f'<div style="font-size:16px; margin-bottom:4px;">'
+                f'Latest YoY Change'
+                f'</div>'
+                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
+                f'{latest_yoy_text}'
+                f'</div>'
+                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
+                f'Latest 12-month comparison'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+            
 # ============================================================
 # Import Value Trend
 # ============================================================
@@ -707,87 +790,3 @@ with chart_right:
             fig_year,
             use_container_width=True
         )
-
-# ============================================================
-# Selected Period Highlights
-# ============================================================
-
-st.subheader("Selected-Period Highlights")
-
-if not df_chart_view.empty:
-
-    highest_row = df_chart_view.loc[
-        df_chart_view["Import_Value"].idxmax()
-    ]
-
-    lowest_row = df_chart_view.loc[
-        df_chart_view["Import_Value"].idxmin()
-    ]
-
-    latest_yoy_series = (
-        df_chart_view["YoY_Growth_Pct"]
-        .dropna()
-    )
-
-    latest_yoy = (
-        latest_yoy_series.iloc[-1]
-        if not latest_yoy_series.empty
-        else None
-    )
-
-    highlight_1, highlight_2, highlight_3 = st.columns(3)
-
-    # Highest value
-    with highlight_1:
-        with st.container(border=True):
-            st.markdown(
-                f'<div style="font-size:16px; margin-bottom:4px;">'
-                f'Highest Import Value'
-                f'</div>'
-                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
-                f'${highest_row["Import_Value"]:,.0f}'
-                f'</div>'
-                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
-                f'Peak month: {highest_row["Period"].strftime("%b %Y")}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-
-    # Lowest value
-    with highlight_2:
-        with st.container(border=True):
-            st.markdown(
-                f'<div style="font-size:16px; margin-bottom:4px;">'
-                f'Lowest Import Value'
-                f'</div>'
-                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
-                f'${lowest_row["Import_Value"]:,.0f}'
-                f'</div>'
-                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
-                f'Lowest month: {lowest_row["Period"].strftime("%b %Y")}'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-
-    # Latest YoY
-    with highlight_3:
-        with st.container(border=True):
-
-            latest_yoy_text = (
-                f"{latest_yoy:.1f}%"
-                if latest_yoy is not None
-                else "N/A"
-            )
-
-            st.markdown(
-                f'<div style="font-size:16px; margin-bottom:4px;">'
-                f'Latest YoY Change'
-                f'</div>'
-                f'<div style="font-size:24px; font-weight:600; margin-bottom:4px;">'
-                f'{latest_yoy_text}'
-                f'</div>'
-                f'<div style="font-size:14px; color:gray; margin-bottom:12px;">'
-                f'Latest 12-month comparison'
-                f'</div>',
-                unsafe_allow_html=True
-            )
