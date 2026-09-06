@@ -108,8 +108,8 @@ st.markdown(
     """
     An interactive forecasting dashboard designed to help food
     business owners understand historical import value movements
-    and anticipate future changes in selected food raw material
-    commodity groups in Indonesia.
+    and anticipate future movements in the aggregate import value
+    of selected food raw material commodity groups in Indonesia.
     """
 )
 
@@ -140,27 +140,32 @@ left, right = st.columns(2)
 
 with left:
 
-    with st.container(border=True):
+    with st.container(border=True, height=470):
 
         st.subheader("Business Problem")
 
         st.markdown(
             """
-            Food businesses depend on stable access to raw materials
-            to manage production costs and protect profit margins.
+            Food businesses that rely on imported raw materials operate
+            within changing international trade and supply conditions.
 
-            Changes in imported food raw materials can indicate shifts
-            in the external market environment, making procurement and
-            financial planning more difficult.
+            Changes in import value can reflect movements in import quantity,
+            prices, exchange rates, or a combination of these factors.
+            Therefore, import-value movements can provide information about
+            changes in the external import environment, but they do not
+            directly represent the raw-material price or production cost
+            faced by an individual business.
             """
         )
 
         st.markdown(
             """
-            When raw material costs rise, business owners may need to
-            reconsider purchasing quantities, budgets, inventory plans,
-            or selling prices. However, increasing selling prices can
-            also affect customer demand.
+            For firms that use imported inputs, changes in import conditions
+            may still be relevant to procurement and business performance.
+            Previous studies in Indonesia show that imported inputs are
+            associated with firm productivity and export performance, while
+            raw-material import intensity has also been linked to the
+            price-cost margin of the food industry.
             """
         )
 
@@ -171,7 +176,7 @@ with left:
 
 with right:
 
-    with st.container(border=True):
+    with st.container(border=True, height=470):
 
         st.subheader("Project Objective")
 
@@ -206,34 +211,37 @@ benefit_1, benefit_3, benefit_4 = st.columns(3)
 
 with benefit_1:
 
-    with st.container(border=True):
+    with st.container(border=True, height=210):
 
         st.markdown("#### 📦 Procurement Planning")
 
         st.write(
             """
-            Use expected import value movements as an additional
-            reference when preparing future purchasing plans.
+            Use expected import-value movements as an additional reference
+            when preparing procurement plans, alongside actual supplier
+            prices, inventory needs, and other business-specific information.
             """
         )
 
 with benefit_3:
 
-    with st.container(border=True):
+    with st.container(border=True, height=210):
 
         st.markdown("#### 🏷️ Pricing Consideration")
 
         st.write(
             """
-            Support earlier evaluation of whether cost changes may
-            require adjustments to pricing or product strategy.
+            Use import-value movements as contextual market information
+            when reviewing pricing or product strategies, together with
+            actual input prices and business-specific cost information. 
+            \n
             """
         )
 
 
 with benefit_4:
 
-    with st.container(border=True):
+    with st.container(border=True, height=210):
 
         st.markdown("#### 📊 Decision Support")
 
@@ -248,9 +256,13 @@ with benefit_4:
 # Important limitation
 st.warning(
     """
-    Important: Import value is not the same as market price or a
-    business's actual ingredient cost. Import value can be influenced
-    by import quantity, prices, exchange rates, and other market factors.
+    Important: Import value is not the same as market price,
+    unit import price, or a business's actual raw-material cost.
+    Changes in import value can be influenced by import quantity,
+    prices, exchange rates, and other market factors. Forecasts
+    should therefore be interpreted as indicators of aggregate
+    import-value movements, not as direct forecasts of input prices
+    or production costs.
     """
 )
 
