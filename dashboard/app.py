@@ -2,7 +2,7 @@ import streamlit as st
 
 # Page Configuration
 st.set_page_config(
-    page_title="Food Ingredient Commodities Import Value Prediction Dashboard",
+    page_title="Food Raw Material Import Value Forecasting Dashboard",
     page_icon="📊",
     layout="wide"
 )

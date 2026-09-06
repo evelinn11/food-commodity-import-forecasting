@@ -85,8 +85,8 @@ GENERAL_MODEL_RESULTS = {
         'commodity': 'Vegetables',
         'SARIMA Base': 17.88,
         'SARIMA Tuned': 19.19,
-        'XGBoost Base': 22.36,
-        'XGBoost Tuned': 21.37
+        'XGBoost Base': 20.47,
+        'XGBoost Tuned': 20.77
     },
 
     '10': {
@@ -101,15 +101,15 @@ GENERAL_MODEL_RESULTS = {
         'commodity': 'Seeds & Oleaginous Fruits',
         'SARIMA Base': 27.93,
         'SARIMA Tuned': 29.87,
-        'XGBoost Base': 28.69,
-        'XGBoost Tuned': 19.96
+        'XGBoost Base': 28.07,
+        'XGBoost Tuned': 21.50
     },
 
     '17': {
         'commodity': 'Sugar',
         'SARIMA Base': 71.44,
         'SARIMA Tuned': 71.53,
-        'XGBoost Base': 40.29,
-        'XGBoost Tuned': 38.61
+        'XGBoost Base': 49.29,
+        'XGBoost Tuned': 37.75
     }
 }
