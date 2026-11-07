@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from pathlib import Path
 
 
 # ============================================================
@@ -35,7 +36,9 @@ COMMODITY_TABLE = pd.DataFrame(
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data/dataset_final_2014_2026.csv")
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    data_path = base_dir / "data" / "dataset_final_2014_2026.csv"
+    df = pd.read_csv(data_path)
 
     # Convert Period into datetime
     df["Period"] = pd.to_datetime(df["Period"])
