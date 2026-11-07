@@ -1,115 +1,65 @@
-# ============================================================
-# Champion Model Metadata
-# Source: Final Model phase of the forecasting experiment
-# ============================================================
+"""Locked model configurations and experiment results.
 
-CHAMPION_MODELS = {
-    '04': {
-        'commodity': 'Dairy & Honey',
-        'model_type': 'XGBoost',
-        'mape': 10.37,
-        'is_logged': True,
-        'features': ['Lag_1', 'Lag_2', 'Month', 'Lag_12', 'Lag_3'],
-        'params': {
-            'learning_rate': 0.01,
-            'max_depth': 3,
-            'n_estimators': 200
-        }
-    },
+Configurations were selected using two expanding-window validation folds.
+Do not change these parameters based on hold-out test performance.
+"""
 
-    '07': {
-        'commodity': 'Vegetables',
-        'model_type': 'SARIMA',
-        'mape': 17.88,
-        'is_logged': True,
-        'order': (1, 1, 1),
-        'seasonal_order': (1, 0, 1, 12)
-    },
-
-    '10': {
-        'commodity': 'Cereals',
-        'model_type': 'XGBoost',
-        'mape': 29.03,
-        'is_logged': True,
-        'features': ['Lag_1', 'Lag_2', 'Lag_12', 'Month'],
-        'params': {
-            'learning_rate': 0.05,
-            'max_depth': 3,
-            'n_estimators': 50
-        }
-    },
-
-    '12': {
-        'commodity': 'Seeds & Oleaginous Fruits',
-        'model_type': 'XGBoost',
-        'mape': 19.76,
-        'is_logged': True,
-        'features': ['Lag_1', 'Month', 'Lag_2', 'Lag_12', 'Lag_6'],
-        'params': {
-            'learning_rate': 0.01,
-            'max_depth': 5,
-            'n_estimators': 50
-        }
-    },
-
-    '17': {
-        'commodity': 'Sugar',
-        'model_type': 'XGBoost',
-        'mape': 36.18,
-        'is_logged': True,
-        'features': ['Lag_1', 'Month', 'Lag_3', 'Lag_2', 'Lag_12'],
-        'params': {
-            'learning_rate': 0.01,
-            'max_depth': 3,
-            'n_estimators': 100
-        }
-    }
+COMMODITY_INFO = {
+    "04": "Dairy & Honey",
+    "07": "Vegetables",
+    "10": "Cereals",
+    "12": "Seeds & Oleaginous Fruits",
+    "17": "Sugar",
 }
 
-# ============================================================
-# General Model Comparison Results
-# Experiment: General SARIMA vs XGBoost
-# Metric: MAPE (%)
-# ============================================================
+TRAIN_START = "2014-01-01"
+DEVELOPMENT_END = "2025-05-01"
+TEST_START = "2025-06-01"
+TEST_END = "2026-05-01"
+FORECAST_START = "2026-06-01"
+FORECAST_END = "2027-05-01"
+FORECAST_HORIZON = 12
+SEASONAL_PERIOD = 12
+RANDOM_STATE = 42
 
-GENERAL_MODEL_RESULTS = {
-    '04': {
-        'commodity': 'Dairy & Honey',
-        'SARIMA Base': 12.19,
-        'SARIMA Tuned': 14.63,
-        'XGBoost Base': 18.91,
-        'XGBoost Tuned': 10.80
-    },
+SARIMA_CONFIG = {
+    "04": {"order": (2, 0, 0), "seasonal_order": (1, 1, 1, 12)},
+    "07": {"order": (1, 1, 1), "seasonal_order": (0, 1, 1, 12)},
+    "10": {"order": (2, 0, 0), "seasonal_order": (1, 1, 1, 12)},
+    "12": {"order": (1, 1, 1), "seasonal_order": (0, 0, 1, 12)},
+    "17": {"order": (2, 0, 1), "seasonal_order": (0, 0, 0, 12)},
+}
 
-    '07': {
-        'commodity': 'Vegetables',
-        'SARIMA Base': 17.88,
-        'SARIMA Tuned': 19.19,
-        'XGBoost Base': 20.47,
-        'XGBoost Tuned': 20.77
-    },
+XGB_FEATURES = [
+    "lag_1", "lag_12", "rolling_mean_3", "rolling_std_3", "month"
+]
 
-    '10': {
-        'commodity': 'Cereals',
-        'SARIMA Base': 82.29,
-        'SARIMA Tuned': 39.61,
-        'XGBoost Base': 36.60,
-        'XGBoost Tuned': 29.03
-    },
+XGB_CONFIG = {
+    "04": {"n_estimators": 100, "max_depth": 3, "learning_rate": 0.03,
+           "subsample": 1.0, "colsample_bytree": 0.8},
+    "07": {"n_estimators": 100, "max_depth": 3, "learning_rate": 0.10,
+           "subsample": 0.8, "colsample_bytree": 0.8},
+    "10": {"n_estimators": 100, "max_depth": 2, "learning_rate": 0.03,
+           "subsample": 0.8, "colsample_bytree": 1.0},
+    "12": {"n_estimators": 100, "max_depth": 3, "learning_rate": 0.03,
+           "subsample": 0.8, "colsample_bytree": 0.8},
+    "17": {"n_estimators": 300, "max_depth": 2, "learning_rate": 0.10,
+           "subsample": 0.8, "colsample_bytree": 0.8},
+}
 
-    '12': {
-        'commodity': 'Seeds & Oleaginous Fruits',
-        'SARIMA Base': 27.93,
-        'SARIMA Tuned': 29.87,
-        'XGBoost Base': 28.07,
-        'XGBoost Tuned': 21.50
-    },
+# Mean MAPE across validation folds, in percent.
+VALIDATION_MAPE = {
+    "04": {"SARIMA": 18.868998, "XGBoost": 20.788036},
+    "07": {"SARIMA": 17.888259, "XGBoost": 21.548667},
+    "10": {"SARIMA": 40.905967, "XGBoost": 61.471861},
+    "12": {"SARIMA": 22.686091, "XGBoost": 19.081374},
+    "17": {"SARIMA": 27.860031, "XGBoost": 27.364783},
+}
 
-    '17': {
-        'commodity': 'Sugar',
-        'SARIMA Base': 71.44,
-        'SARIMA Tuned': 71.53,
-        'XGBoost Base': 49.29,
-        'XGBoost Tuned': 37.75
-    }
+VALIDATION_FOLD_MAPE = {
+    "04": {"SARIMA": [17.280341, 20.457654], "XGBoost": [31.107347, 10.468725]},
+    "07": {"SARIMA": [25.002368, 10.774151], "XGBoost": [26.747639, 16.349694]},
+    "10": {"SARIMA": [44.214046, 37.597888], "XGBoost": [45.299402, 77.644321]},
+    "12": {"SARIMA": [25.882648, 19.489535], "XGBoost": [17.184531, 20.978216]},
+    "17": {"SARIMA": [14.287587, 41.432475], "XGBoost": [27.492967, 27.236599]},
 }

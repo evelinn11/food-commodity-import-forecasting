@@ -9,19 +9,19 @@ st.set_page_config(
 
 # Sidebar Navigation
 summary_page = st.Page(
-    "summary-page.py",
+    "pages/summary-page.py",
     title="Summary",
     icon="📕"
 )
 
 forecasting_page = st.Page(
-    "forecasting-page.py",
+    "pages/forecasting-page.py",
     title="Forecasting",
     icon="📈"
 )
 
 evaluation_page = st.Page(
-    "evaluation-page.py",
+    "pages/evaluation-page.py",
     title="Evaluation",
     icon="📋"
 )
