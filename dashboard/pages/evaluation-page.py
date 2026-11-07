@@ -1,7 +1,15 @@
+import sys
+
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 from pathlib import Path
+import sys
+from pathlib import Path
+
+DASHBOARD_DIR = Path(__file__).resolve().parent.parent
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.append(str(DASHBOARD_DIR))
 
 from model_config import (
     COMMODITY_INFO, SARIMA_CONFIG, XGB_CONFIG, XGB_FEATURES,

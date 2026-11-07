@@ -6,6 +6,14 @@ from pathlib import Path
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from xgboost import XGBRegressor
 
+import sys
+from pathlib import Path
+
+# Memasukkan folder 'dashboard' ke dalam sys.path Python
+DASHBOARD_DIR = Path(__file__).resolve().parent.parent
+if str(DASHBOARD_DIR) not in sys.path:
+    sys.path.append(str(DASHBOARD_DIR))
+
 from model_config import (
     COMMODITY_INFO, SARIMA_CONFIG, XGB_CONFIG, XGB_FEATURES,
     VALIDATION_MAPE, FORECAST_HORIZON, FORECAST_START, FORECAST_END,
